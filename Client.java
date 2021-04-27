@@ -7,15 +7,13 @@ import javax.swing.plaf.basic.BasicInternalFrameTitlePane.SystemMenuBar;
 public class Client {  
    private Client() {}  
    public static void main(String[] args) {  
+      Scanner sc = new Scanner(System.in);  
       try {  
          // Getting the registry 
          Registry registry = LocateRegistry.getRegistry(null); 
-    
          // Looking up the registry for the remote object 
          UtilsClass stub = (UtilsClass) registry.lookup("Dream11"); 
          String str;
-         while(true){
-            Scanner sc = new Scanner(System.in);  
             while(sc.hasNext()){
                try{
                   str = sc.nextLine();
@@ -26,7 +24,7 @@ public class Client {
                      for(int i=3;i<splited.length;i++){
                         playerNames  = playerNames + " " + splited[i];
                      }
-                     stub.AddMatch(Integer.parseInt(splited[1]), playerNames);
+                     System.out.printf("Match ID %d\n" , stub.AddMatch(Integer.parseInt(splited[1]), playerNames));
                   }
                   else if(splited[0].equals("update_player_score")){
                      stub.UpdatePlayerScore(Integer.parseInt(splited[1]), Integer.parseInt(splited[2]), Integer.parseInt(splited[3]));
@@ -65,7 +63,6 @@ public class Client {
                   break;
                }
             }
-         } 
       } catch (Exception e) {
          System.err.println("Client exception: " + e.toString()); 
          e.printStackTrace(); 

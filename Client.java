@@ -54,7 +54,7 @@ public class Client {
                      stub.ShowPlayers(Integer.parseInt(splited[1]));
                   }
                   else{
-                     System.out.println("Please provide a valid input");
+                     System.out.println("Please provide a valid input\n");
                   }
 
                }

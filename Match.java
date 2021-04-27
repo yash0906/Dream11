@@ -47,22 +47,21 @@ class Match {
     public int getUserScore(int userId){
         int userTeamId = userTeam.get(userId);
         int score = getTeamScore(userTeamId);
-        System.out.printf("User Score: %d" , score);
+        System.out.printf("User Score: %d\n" , score);
         return score; 
     }
     public int getUserRank(int userId){
         int userTeamId = userTeam.get(userId);
         int rank = teamRank[userTeamId];
-        System.out.printf("User Rank: %d" , rank);
+        System.out.printf("User Rank: %d\n" , rank);
         return rank;    
     }
     public void getLeaderBoard(){
         for(int i=0;i<numUsers;i++){
-            System.out.printf("User %d rank is %d" , i,teamRank[userTeam.get(i)]);
+            System.out.printf("User %d rank is %d\n" , i,teamRank[userTeam.get(i)]);
         }
     }
     public void startMatch(){
-        System.out.printf("numoftemas is %d\n" , numTeams);
         sortedTeams = new int[numTeams];
         teamRank = new int[numTeams];
         for(int i=0;i<numTeams;i++){
@@ -83,14 +82,22 @@ class Match {
                 sortedTeams[j] = curTeamId;
             }
         }
+        System.out.printf("CALLED IN SORT\n");
+        for(int i=0;i<numTeams;i++){
+            System.out.printf("User %d rank is %d\n" , sortedTeams[i],i);
+        }
         teamRank[sortedTeams[0]] = 0;
         for(int i=1;i<numTeams;i++){
-            if(getTeamScore(sortedTeams[i])>getTeamScore(sortedTeams[i-1])){
+            if(getTeamScore(sortedTeams[i])<getTeamScore(sortedTeams[i-1])){
                 teamRank[sortedTeams[i]] = teamRank[sortedTeams[i-1]]+1;
             }
             else{
                 teamRank[sortedTeams[i]] = teamRank[sortedTeams[i-1]];
             }
+        }
+        System.out.printf("TEAM RANK CALLED IN SORT\n");
+        for(int i=0;i<numTeams;i++){
+            System.out.printf("User %d rank is %d\n" , i,teamRank[i]);
         }
 
     }
@@ -106,7 +113,7 @@ class Match {
 
         // System.out.printf("in show players");
         for(int i=0;i<2*numPlayers;i++){
-            System.out.printf("%s %d", playerNames.get(i),i);
+            System.out.printf("%s %d\n", playerNames.get(i),i);
         }
     }
     

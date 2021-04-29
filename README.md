@@ -1,5 +1,12 @@
-## steps to run code
+## How to run
+- Extract jars folder: `tar -czvf jars.tar.gz`
+- Add jars folder to java class path
+  - Add this line to .bashrc: `export CLASSPATH=$CLASSPATH:<path_to_jars>/*:<path_to_jars>/lib/*`
+- Ensure cassandra is insalled and a server is running on localhost
 - javac *.java
 - rmiregistry (Ubuntu)
-- java Server (new terminal)
+- java Server1 (new terminal)
+- java Server2 (new terminal)
+- java Server3 (new terminal)
+- java MasterServer (new terminal)
 - java Client (new terminal)

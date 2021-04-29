@@ -35,20 +35,32 @@ public class MasterServerImpl implements UtilsServer {
                 for (int i = 3; i < splited.length; i++) {
                     playerNames = playerNames + " " + splited[i];
                 }
-                for(UtilsClass node:nodeList)
-                    System.out.printf("Match ID %d\n", node.AddMatch(Integer.parseInt(splited[1]), playerNames));
+                
+                System.out.printf("Match ID %d\n", nodeList.get(0).AddMatch(Integer.parseInt(splited[1]), playerNames, true));
+                for(int i=1; i<nodeList.size(); i++) 
+                    System.out.printf("Match ID %d\n", nodeList.get(i).AddMatch(Integer.parseInt(splited[1]), playerNames, false));
+                // for(UtilsClass node:nodeList)
+                //     System.out.printf("Match ID %d\n", node.AddMatch(Integer.parseInt(splited[1]), playerNames));
             } 
             else if (splited[0].equals("update_player_score")) {
-                for(UtilsClass node:nodeList)
-                    node.UpdatePlayerScore(Integer.parseInt(splited[1]), Integer.parseInt(splited[2]), Integer.parseInt(splited[3]));
+                nodeList.get(0).UpdatePlayerScore(Integer.parseInt(splited[1]), Integer.parseInt(splited[2]), Integer.parseInt(splited[3]), true);
+                for(int i=1; i<nodeList.size(); i++)
+                    nodeList.get(i).UpdatePlayerScore(Integer.parseInt(splited[1]), Integer.parseInt(splited[2]), Integer.parseInt(splited[3]), false);
+                // for(UtilsClass node:nodeList)
+                //     node.UpdatePlayerScore(Integer.parseInt(splited[1]), Integer.parseInt(splited[2]), Integer.parseInt(splited[3]));
             } 
             else if (splited[0].equals("create_team")) {
                 int[] playerIds = new int[splited.length - 2];
                 for (int i = 0; i < splited.length - 2; i++) {
                     playerIds[i] = Integer.parseInt(splited[i + 2]);
                 }
-                for(UtilsClass node:nodeList)
-                    System.out.printf("Your generated userId is %d\n", node.UserCreateTeam(Integer.parseInt(splited[1]), playerIds));
+                
+                System.out.printf("Your generated userId is %d\n", nodeList.get(0).UserCreateTeam(Integer.parseInt(splited[1]), playerIds, true));
+                for(int i=1; i<nodeList.size(); i++)
+                    System.out.printf("Your generated userId is %d\n", nodeList.get(i).UserCreateTeam(Integer.parseInt(splited[1]), playerIds, false));
+                                
+                // for(UtilsClass node:nodeList)
+                // System.out.printf("Your generated userId is %d\n", node.UserCreateTeam(Integer.parseInt(splited[1]), playerIds));
             } 
             else if (splited[0].equals("get_score")) {
                 int userId = Integer.parseInt(splited[2]);

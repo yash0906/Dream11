@@ -35,3 +35,10 @@
 - `start_match <match id>`: Start match <match id>. No new teams can be created after this
 - `show_players <match id>`: Show player names and player Ids of all players playing in match <match id>
 - `exit <match id>`: Stop the match simulation and exit the program
+
+## Server functions:
+- Master server:
+  - `add_node <nodeName>`: Add a new slave node with name <nodeName>
+  - `delete_node <nodeName>`: Delete an existing slave node with name <nodeName>
+- Slave server:
+  - `load`: Sync match data with the database. (Useful when bootstrapping a new slave server while the match is ongoing)

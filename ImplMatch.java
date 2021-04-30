@@ -30,17 +30,22 @@ public class ImplMatch implements UtilsClass {
       Match match = map.get(matchId);
       return match.getUserRank(userId);
    }
-   public void GetLeaderBoard(int matchId){
+   public String GetLeaderBoard(int matchId){
       Match match = map.get(matchId);
-      match.getLeaderBoard();
+      return match.getLeaderBoard();
    }
    public void startMatch(int matchId){
       Match match = map.get(matchId);
       match.startMatch();
    }
-   public void ShowPlayers(int matchId){
+   public String ShowPlayers(int matchId){
       Match match = map.get(matchId);
-      match.showPlayers();
+      return match.showPlayers();
+   }
+
+   public void DeleteMatch(int matchId) {
+      Match match = map.get(matchId);
+      match.DeleteMatch();
    }
 
 } 

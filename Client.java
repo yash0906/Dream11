@@ -2,12 +2,11 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;  
 import java.util.*;
 
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.SystemMenuBar;
-
 public class Client {  
    private Client() {}  
    public static void main(String[] args) {  
-      Scanner sc = new Scanner(System.in);  
+      Scanner sc = new Scanner(System.in); 
+      String result = ""; 
       try {  
          // Getting the registry 
          Registry registry = LocateRegistry.getRegistry(null); 
@@ -18,7 +17,11 @@ public class Client {
                try{
                   str = sc.nextLine();
                   // System.out.print("You have entered: "+str + "\n");
-                  stub.Query(str);
+                  result = stub.Query(str);
+                  System.out.println(result);
+                  if (str.equals("exit")) {
+                     System.exit(0);
+                  }
                }
                catch(Exception e){
                   System.out.println(e);

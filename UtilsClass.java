@@ -7,9 +7,10 @@ public interface UtilsClass extends Remote {
    int UserCreateTeam(int matchId, int[] playerIds, boolean update) throws RemoteException;
    int GetScore(int matchId, int userId) throws RemoteException;
    int GetRank(int matchId, int userId) throws RemoteException;
-   void GetLeaderBoard(int matchId) throws RemoteException;
+   String GetLeaderBoard(int matchId) throws RemoteException;
    int AddMatch(int v,String players, boolean update) throws RemoteException;
    void LoadMatch(int matchId) throws RemoteException;
    void startMatch(int matchId) throws RemoteException;
-   void ShowPlayers(int matchId) throws RemoteException;
+   String ShowPlayers(int matchId) throws RemoteException;
+   void DeleteMatch(int matchId) throws RemoteException;
 } 

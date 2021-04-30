@@ -57,16 +57,13 @@ class Match {
         result = session.execute("SELECT DISTINCT playerID FROM players;");
         numPlayers = result.all().size()/2;
 
-        result = session.execute("SELECT DISTINCT teamID FROM teams;");
-        numTeams = result.all().size();
-
-        result = session.execute("SELECT DISTINCT userID FROM teams;");
+        result = session.execute("SELECT DISTINCT userID,matchID FROM teams;");
         numUsers = result.all().size();
-
+     
         playerScore = new int [2*numPlayers];
         result = session.execute("SELECT playerID, score, playerName FROM players;");
         List<Row> rows = result.all();
-
+    
         for(Row row:rows) {
             playerScore[row.getInt(0)] = row.getInt(1);
             playerNames.put(row.getInt(0), row.getString(2));
@@ -74,13 +71,21 @@ class Match {
 
         result = session.execute("SELECT userID, teamID, playerIDs FROM teams;");
         List<Row> users = result.all();
-
+        
+        int max = 0;
         for(Row row:users) {
+            if (max < row.getInt(1)) max = row.getInt(1);
             userTeam.put(row.getInt(0), row.getInt(1));
-            teams.put(row.get(2, int[].class), row.getInt(1));
-            teamsId.put(row.getInt(1), row.get(2, int[].class));
+            List<Integer> list = row.getList(2, Integer.class);
+            int[] arr = new int[list.size()];
+            for(int i=0; i<list.size(); i++) arr[i] = list.get(i);
+            teams.put(arr, row.getInt(1));
+            teamsId.put(row.getInt(1), arr);
         }
+        
+        numTeams = max+1;
 
+        startMatch();
         sortTeams();
         session.close();
     }
@@ -141,10 +146,15 @@ class Match {
         System.out.printf("User Rank: %d\n" , rank);
         return rank;    
     }
-    public void getLeaderBoard(){
+    public String getLeaderBoard(){
+        String leaderBoard = "";
+        int rank = 0;
         for(int i=0;i<numUsers;i++){
-            System.out.printf("User %d rank is %d\n" , i,teamRank[userTeam.get(i)]);
+            rank = teamRank[userTeam.get(i)];
+            System.out.printf("User %d rank is %d\n" , i,rank);
+            leaderBoard += "User " + i + " rank is " + rank + "\n";
         }
+        return leaderBoard;
     }
     public void startMatch(){
         sortedTeams = new int[numTeams];
@@ -194,12 +204,22 @@ class Match {
         }
         return score;
     }
-    public void showPlayers(){
+    public String showPlayers(){
 
-        // System.out.printf("in show players");
+        String players = "Player Name - Player ID\n";
         for(int i=0;i<2*numPlayers;i++){
             System.out.printf("%s %d\n", playerNames.get(i),i);
+            players += playerNames.get(i) + " - " + i + "\n";
         }
+        return players;
+    }
+
+    public void DeleteMatch() {
+        session = cluster.connect();
+        session.execute("USE Dream11;");
+        session.execute("TRUNCATE teams;");
+        session.execute("TRUNCATE players;");
+        session.close();
     }
     
 }

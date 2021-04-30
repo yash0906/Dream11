@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 public class MasterServerImpl implements UtilsServer {
     List<UtilsClass> nodeList;
+    int totalNodes = 3;
     public MasterServerImpl() {
         System.out.printf("Succes in master");
         try{
@@ -25,70 +26,135 @@ public class MasterServerImpl implements UtilsServer {
          }
     }
 
-    public void Query(String query) {
+    public String Query(String query) {
         try{
             System.out.println(query);
             String[] splited = query.split(" ");
             UtilsClass stub = nodeList.get(0); // here stub will depend on the user id, for now just using the first node
             if (splited[0].equals("add_match")) {
-                String playerNames = splited[2];
-                for (int i = 3; i < splited.length; i++) {
-                    playerNames = playerNames + " " + splited[i];
+                try{
+                    String playerNames = splited[2];
+                    for (int i = 3; i < splited.length; i++) {
+                        playerNames = playerNames + " " + splited[i];
+                    }
+                    
+                    int matchID = nodeList.get(0).AddMatch(Integer.parseInt(splited[1]), playerNames, true);
+                    System.out.printf("Match ID %d\n", matchID);
+                    for(int i=1; i<nodeList.size(); i++) 
+                        System.out.printf("Match ID %d\n", nodeList.get(i).AddMatch(Integer.parseInt(splited[1]), playerNames, false));
+                   
+                    return "Match ID " + matchID + " created!";
+                } catch (Exception ee) {
+                    System.err.println("Client exception: " + ee.toString()); 
+                    ee.printStackTrace();
+                    return "Invalid syntax: Try: add_match <num players per team> <all player names>";
                 }
-                
-                System.out.printf("Match ID %d\n", nodeList.get(0).AddMatch(Integer.parseInt(splited[1]), playerNames, true));
-                for(int i=1; i<nodeList.size(); i++) 
-                    System.out.printf("Match ID %d\n", nodeList.get(i).AddMatch(Integer.parseInt(splited[1]), playerNames, false));
-                // for(UtilsClass node:nodeList)
-                //     System.out.printf("Match ID %d\n", node.AddMatch(Integer.parseInt(splited[1]), playerNames));
             } 
             else if (splited[0].equals("update_player_score")) {
-                nodeList.get(0).UpdatePlayerScore(Integer.parseInt(splited[1]), Integer.parseInt(splited[2]), Integer.parseInt(splited[3]), true);
-                for(int i=1; i<nodeList.size(); i++)
-                    nodeList.get(i).UpdatePlayerScore(Integer.parseInt(splited[1]), Integer.parseInt(splited[2]), Integer.parseInt(splited[3]), false);
-                // for(UtilsClass node:nodeList)
-                //     node.UpdatePlayerScore(Integer.parseInt(splited[1]), Integer.parseInt(splited[2]), Integer.parseInt(splited[3]));
+                try {
+                    nodeList.get(0).UpdatePlayerScore(Integer.parseInt(splited[1]), Integer.parseInt(splited[2]), Integer.parseInt(splited[3]), true);
+                    for(int i=1; i<nodeList.size(); i++)
+                        nodeList.get(i).UpdatePlayerScore(Integer.parseInt(splited[1]), Integer.parseInt(splited[2]), Integer.parseInt(splited[3]), false);
+                    
+                    return "Player " + splited[2] + " score increased by " + splited[3];
+                } catch (Exception ee) {
+                    System.err.println("Client exception: " + ee.toString()); 
+                    ee.printStackTrace();
+                    return "Invalid syntax: Try: update_player_score <match id> <player id> <score>";
+                }
             } 
             else if (splited[0].equals("create_team")) {
-                int[] playerIds = new int[splited.length - 2];
-                for (int i = 0; i < splited.length - 2; i++) {
-                    playerIds[i] = Integer.parseInt(splited[i + 2]);
+                try{
+                    int[] playerIds = new int[splited.length - 2];
+                    for (int i = 0; i < splited.length - 2; i++) {
+                        playerIds[i] = Integer.parseInt(splited[i + 2]);
+                    }
+                    
+                    int userid = nodeList.get(0).UserCreateTeam(Integer.parseInt(splited[1]), playerIds, true);
+                    System.out.printf("Your generated userId is %d\n", userid);
+                    for(int i=1; i<nodeList.size(); i++)
+                        System.out.printf("Your generated userId is %d\n", nodeList.get(i).UserCreateTeam(Integer.parseInt(splited[1]), playerIds, false));
+                                    
+                    return "Team created! Your userID is " + userid;
+                } catch (Exception ee) {
+                    System.err.println("Client exception: " + ee.toString()); 
+                    ee.printStackTrace();
+                    return "Invalid syntax: Try: create_team <match id> <player ids>";
                 }
-                
-                System.out.printf("Your generated userId is %d\n", nodeList.get(0).UserCreateTeam(Integer.parseInt(splited[1]), playerIds, true));
-                for(int i=1; i<nodeList.size(); i++)
-                    System.out.printf("Your generated userId is %d\n", nodeList.get(i).UserCreateTeam(Integer.parseInt(splited[1]), playerIds, false));
-                                
-                // for(UtilsClass node:nodeList)
-                // System.out.printf("Your generated userId is %d\n", node.UserCreateTeam(Integer.parseInt(splited[1]), playerIds));
             } 
             else if (splited[0].equals("get_score")) {
-                int userId = Integer.parseInt(splited[2]);
-                System.out.printf("Your score with userId %d is %d\n", userId,
-                        stub.GetScore(Integer.parseInt(splited[1]), userId));
+                try{
+                    int userId = Integer.parseInt(splited[2]);
+                    stub = nodeList.get(userId%totalNodes);
+                    int score = stub.GetScore(Integer.parseInt(splited[1]), userId);
+                    System.out.printf("Your score with userId %d is %d\n", userId, score);
+                    return "Your score with userId " + userId + " is " + score;
+                } catch (Exception ee) {
+                    System.err.println("Client exception: " + ee.toString()); 
+                    ee.printStackTrace();
+                    return "Invalid syntax: Try: get_score <match id> <user id>";
+                }
             } 
             else if (splited[0].equals("get_rank")) {
-                int userId = Integer.parseInt(splited[2]);
-                System.out.printf("Your rank with userId %d is %d\n", userId,
-                        stub.GetRank(Integer.parseInt(splited[1]), userId));
+                try{
+                    int userId = Integer.parseInt(splited[2]);
+                    stub = nodeList.get(userId%totalNodes);
+                    int rank = stub.GetRank(Integer.parseInt(splited[1]), userId);
+                    System.out.printf("Your rank with userId %d is %d\n", userId, rank);
+                    return "Your rank with userId " + userId + " is " + rank;
+                } catch (Exception ee) {
+                    System.err.println("Client exception: " + ee.toString()); 
+                    ee.printStackTrace();
+                    return "Invalid syntax: Try: get_rank <match id> <user id>";
+                }
             } 
             else if (splited[0].equals("get_leaderboard")) {
-                stub.GetLeaderBoard(Integer.parseInt(splited[1]));
+                try {
+                    return stub.GetLeaderBoard(Integer.parseInt(splited[1]));
+                } catch (Exception ee) {
+                    System.err.println("Client exception: " + ee.toString()); 
+                    ee.printStackTrace();
+                    return "Invalid syntax: Try: get_leaderboard <match id>";
+                }
             } 
             else if (splited[0].equals("start_match")) {
-                for(UtilsClass node:nodeList)
-                    node.startMatch(Integer.parseInt(splited[1]));
+                try{
+                    for(UtilsClass node:nodeList)
+                        node.startMatch(Integer.parseInt(splited[1]));
+                    return "Match " + splited[1] + " started";
+                } catch (Exception ee) {
+                    System.err.println("Client exception: " + ee.toString()); 
+                    ee.printStackTrace();
+                    return "Invalid syntax: Try: start_match <match id>";
+                }
             } 
             else if (splited[0].equals("show_players")) {
-                stub.ShowPlayers(Integer.parseInt(splited[1]));
+                try{
+                    return stub.ShowPlayers(Integer.parseInt(splited[1]));
+                } catch (Exception ee) {
+                    System.err.println("Client exception: " + ee.toString()); 
+                    ee.printStackTrace();
+                    return "Invalid syntax: Try: show_players <match id>";
+                }
             } 
+            else if (splited[0].equals("exit")) {
+                try{
+                    nodeList.get(0).DeleteMatch(Integer.parseInt(splited[1]));
+                    return "Match Ended";
+                } catch (Exception ee) {
+                    System.err.println("Client exception: " + ee.toString()); 
+                    ee.printStackTrace();
+                    return "Invalid syntax: Try: exit <match id>";
+                }
+            }
             else {
-                System.out.println("Please provide a valid input\n");
+                return "Please provide a valid input";
             }
         }
         catch (Exception e) {
             System.err.println("Client exception: " + e.toString()); 
             e.printStackTrace(); 
+            return "A server error occured! Please Try again";
          }
     }
 }

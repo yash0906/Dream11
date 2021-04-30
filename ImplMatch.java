@@ -5,9 +5,9 @@ public class ImplMatch implements UtilsClass {
    Map<Integer,Match> map=new HashMap<Integer,Match>(); 
    int numMatches = 0;// keep track of number of matches
    // Implementing the interface method 
-   public int AddMatch(int v,String players, boolean update){
+   public int AddMatch(int v,String players, boolean update, String db_addr){
       // add this to database
-      map.put(numMatches, new Match(v,players, update));
+      map.put(numMatches, new Match(v,players, update, db_addr));
       return numMatches++; 
    }  
    public void LoadMatch(int matchId) {

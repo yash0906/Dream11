@@ -6,6 +6,9 @@ public class MasterServerImpl implements UtilsServer {
     List<UtilsClass> nodeList;
     List<String> nodeNames;
     Registry registry;
+    List<String> CassandraNodes = new ArrayList<>();
+    int counter;
+    boolean flag;
 
     public MasterServerImpl() {
         System.out.printf("Succes in master");
@@ -26,6 +29,10 @@ public class MasterServerImpl implements UtilsServer {
             names.add("Dream11-node3");
             nodeList = list;
             nodeNames = names;
+            for(int i=1; i<6; i++) {
+                CassandraNodes.add("127.0.0."+ i);
+            }
+            counter = 0;
         }
         catch (Exception e) { 
             System.err.println("Master exception: " + e.toString()); 
@@ -77,10 +84,14 @@ public class MasterServerImpl implements UtilsServer {
                         playerNames = playerNames + " " + splited[i];
                     }
                     
-                    int matchID = nodeList.get(0).AddMatch(Integer.parseInt(splited[1]), playerNames, true);
+                    flag = (counter == 0)? true : false;
+                    int matchID = nodeList.get(0).AddMatch(Integer.parseInt(splited[1]), playerNames, false, CassandraNodes.get(0));
                     System.out.printf("Match ID %d\n", matchID);
-                    for(int i=1; i<nodeList.size(); i++) 
-                        System.out.printf("Match ID %d\n", nodeList.get(i).AddMatch(Integer.parseInt(splited[1]), playerNames, false));
+                    for(int i=1; i<nodeList.size(); i++) {
+                        flag  = (counter == i) ? true : false;
+                        System.out.printf("Match ID %d\n", nodeList.get(i).AddMatch(Integer.parseInt(splited[1]), playerNames, flag, CassandraNodes.get(i%CassandraNodes.size())));
+                    }
+                    counter = (counter + 1)%nodeList.size();
                    
                     return "Match ID " + matchID + " created!";
                 } catch (Exception ee) {
@@ -91,10 +102,12 @@ public class MasterServerImpl implements UtilsServer {
             } 
             else if (splited[0].equals("update_player_score")) {
                 try {
-                    nodeList.get(0).UpdatePlayerScore(Integer.parseInt(splited[1]), Integer.parseInt(splited[2]), Integer.parseInt(splited[3]), true);
-                    for(int i=1; i<nodeList.size(); i++)
-                        nodeList.get(i).UpdatePlayerScore(Integer.parseInt(splited[1]), Integer.parseInt(splited[2]), Integer.parseInt(splited[3]), false);
-                    
+                    flag = (counter == 0)? true : false;
+                    for(int i=1; i<nodeList.size(); i++){
+                        flag = (counter == i)? true : false;
+                        nodeList.get(i).UpdatePlayerScore(Integer.parseInt(splited[1]), Integer.parseInt(splited[2]), Integer.parseInt(splited[3]), flag);
+                    }
+                    counter = (counter + 1)%nodeList.size();
                     return "Player " + splited[2] + " score increased by " + splited[3];
                 } catch (Exception ee) {
                     System.err.println("Client exception: " + ee.toString()); 
@@ -108,11 +121,13 @@ public class MasterServerImpl implements UtilsServer {
                     for (int i = 0; i < splited.length - 2; i++) {
                         playerIds[i] = Integer.parseInt(splited[i + 2]);
                     }
-                    
-                    int userid = nodeList.get(0).UserCreateTeam(Integer.parseInt(splited[1]), playerIds, true);
+                    flag = (counter == 0)? true : false;
+                    int userid = nodeList.get(0).UserCreateTeam(Integer.parseInt(splited[1]), playerIds, flag);
                     // System.out.printf("Your generated userId is %d\n", userid);
-                    // for(int i=1; i<nodeList.size(); i++)
-                    //     System.out.printf("Your generated userId is %d\n", nodeList.get(i).UserCreateTeam(Integer.parseInt(splited[1]), playerIds, false));
+                    for(int i=1; i<nodeList.size(); i++) {
+                        flag = (counter == i)? true : false;
+                        System.out.printf("Your generated userId is %d\n", nodeList.get(i).UserCreateTeam(Integer.parseInt(splited[1]), playerIds, flag));
+                    }
                                     
                     return "Team created! Your userID is " + userid;
                 } catch (Exception ee) {

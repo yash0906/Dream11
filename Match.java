@@ -22,7 +22,7 @@ class Match {
     ResultSet result;
 
 
-    Match(int v, String players, boolean update){
+    Match(int v, String players, boolean update, String db_addr){
         numPlayers = v;
         String[] splited = players.split(" ");
         playerScore = new int[2*v]; // each team has v player, so in total there are 2*v players
@@ -34,7 +34,7 @@ class Match {
         numUsers = 0;
         numTeams = 0;
         
-        cluster = Cluster.builder().addContactPoint("127.0.0.1").build();
+        cluster = Cluster.builder().addContactPoint(db_addr).build();
         if (update) {
             session = cluster.connect();
             session.execute("USE Dream11");

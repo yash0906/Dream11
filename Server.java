@@ -55,7 +55,7 @@ public class Server extends ImplMatch {
                   break;
                
                case "load":
-                  stub.AddMatch(0, "", false);
+                  stub.AddMatch(0, "", false, "127.0.0.1");
                   stub.LoadMatch(0);
                   break;
                

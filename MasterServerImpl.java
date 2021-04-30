@@ -1,29 +1,68 @@
 import java.util.*;
 import java.rmi.registry.Registry; 
-import java.rmi.registry.LocateRegistry; 
-import java.rmi.RemoteException; 
-import java.rmi.server.UnicastRemoteObject;
+import java.rmi.registry.LocateRegistry;
+
 public class MasterServerImpl implements UtilsServer {
     List<UtilsClass> nodeList;
-    int totalNodes = 3;
+    List<String> nodeNames;
+    Registry registry;
+
     public MasterServerImpl() {
         System.out.printf("Succes in master");
         try{
-            Registry registry = LocateRegistry.getRegistry(null);
+            registry = LocateRegistry.getRegistry(null);
             // Looking up the registry for the remote object 
             UtilsClass stub1 = (UtilsClass) registry.lookup("Dream11-node1"); 
             UtilsClass stub2 = (UtilsClass) registry.lookup("Dream11-node2"); 
             UtilsClass stub3 = (UtilsClass) registry.lookup("Dream11-node3"); 
-            List<UtilsClass> list = new ArrayList<UtilsClass>();
+            
+            List<UtilsClass> list = new ArrayList<>();
+            List<String> names = new ArrayList<>();
             list.add(stub1);
+            names.add("Dream11-node1");
             list.add(stub2);
+            names.add("Dream11-node2");
             list.add(stub3);
+            names.add("Dream11-node3");
             nodeList = list;
+            nodeNames = names;
         }
         catch (Exception e) { 
             System.err.println("Master exception: " + e.toString()); 
             e.printStackTrace(); 
          }
+    }
+
+    public void AddNode(String nodeName) {
+        int index = nodeNames.indexOf(nodeName);
+        if (index >= 0) {
+            System.out.println("Node already exists!");
+        }
+        else {
+            try {
+                nodeNames.add(nodeName);
+                UtilsClass stub = (UtilsClass) registry.lookup(nodeName);
+                nodeList.add(stub);
+                System.out.println("Node " + nodeName + " added!");
+            } catch (Exception e) {
+                System.err.println("Error occured while adding: " + e.toString());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void DeleteNode(String nodeName) {
+        int index = nodeNames.indexOf(nodeName);
+        try {
+            if(index >= 0) {
+                nodeNames.remove(index);
+                nodeList.remove(index);
+            }
+            System.out.println("Node " + nodeName + " removed!");
+        } catch (Exception e) {
+            System.err.println("Error occured while deleting: " + e.toString());
+            e.printStackTrace();
+        }
     }
 
     public String Query(String query) {
@@ -85,7 +124,7 @@ public class MasterServerImpl implements UtilsServer {
             else if (splited[0].equals("get_score")) {
                 try{
                     int userId = Integer.parseInt(splited[2]);
-                    stub = nodeList.get(userId%totalNodes);
+                    stub = nodeList.get(userId%nodeList.size());
                     int score = stub.GetScore(Integer.parseInt(splited[1]), userId);
                     System.out.printf("Your score with userId %d is %d\n", userId, score);
                     return "Your score with userId " + userId + " is " + score;
@@ -98,7 +137,7 @@ public class MasterServerImpl implements UtilsServer {
             else if (splited[0].equals("get_rank")) {
                 try{
                     int userId = Integer.parseInt(splited[2]);
-                    stub = nodeList.get(userId%totalNodes);
+                    stub = nodeList.get(userId%nodeList.size());
                     int rank = stub.GetRank(Integer.parseInt(splited[1]), userId);
                     System.out.printf("Your rank with userId %d is %d\n", userId, rank);
                     return "Your rank with userId " + userId + " is " + rank;

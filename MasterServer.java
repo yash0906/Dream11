@@ -33,7 +33,7 @@ public class MasterServer{
          registry.rebind("Dream11-master", stub);
          System.err.println("Master Server ready"); 
 
-         String command="";
+         String command="", name="";
          while(sc.hasNextLine()) {
             command = sc.next();
 
@@ -45,6 +45,16 @@ public class MasterServer{
                   System.exit(0);
                   break;
                
+               case "add_node":
+                  name = sc.next();
+                  stub.AddNode(name);
+                  break;
+               
+               case "delete_node":
+                  name = sc.next();
+                  stub.DeleteNode(name);
+                  break;
+                  
                default:
                   System.err.println(command);
             }

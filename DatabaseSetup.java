@@ -46,6 +46,7 @@ public class DatabaseSetup {
             session.execute("TRUNCATE TABLE players;");
         }
 
+        System.exit(0);
 
     }
 }

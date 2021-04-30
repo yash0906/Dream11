@@ -110,9 +110,9 @@ public class MasterServerImpl implements UtilsServer {
                     }
                     
                     int userid = nodeList.get(0).UserCreateTeam(Integer.parseInt(splited[1]), playerIds, true);
-                    System.out.printf("Your generated userId is %d\n", userid);
-                    for(int i=1; i<nodeList.size(); i++)
-                        System.out.printf("Your generated userId is %d\n", nodeList.get(i).UserCreateTeam(Integer.parseInt(splited[1]), playerIds, false));
+                    // System.out.printf("Your generated userId is %d\n", userid);
+                    // for(int i=1; i<nodeList.size(); i++)
+                    //     System.out.printf("Your generated userId is %d\n", nodeList.get(i).UserCreateTeam(Integer.parseInt(splited[1]), playerIds, false));
                                     
                     return "Team created! Your userID is " + userid;
                 } catch (Exception ee) {
@@ -126,7 +126,7 @@ public class MasterServerImpl implements UtilsServer {
                     int userId = Integer.parseInt(splited[2]);
                     stub = nodeList.get(userId%nodeList.size());
                     int score = stub.GetScore(Integer.parseInt(splited[1]), userId);
-                    System.out.printf("Your score with userId %d is %d\n", userId, score);
+                    // System.out.printf("Your score with userId %d is %d\n", userId, score);
                     return "Your score with userId " + userId + " is " + score;
                 } catch (Exception ee) {
                     System.err.println("Client exception: " + ee.toString()); 
@@ -139,7 +139,7 @@ public class MasterServerImpl implements UtilsServer {
                     int userId = Integer.parseInt(splited[2]);
                     stub = nodeList.get(userId%nodeList.size());
                     int rank = stub.GetRank(Integer.parseInt(splited[1]), userId);
-                    System.out.printf("Your rank with userId %d is %d\n", userId, rank);
+                    // System.out.printf("Your rank with userId %d is %d\n", userId, rank);
                     return "Your rank with userId " + userId + " is " + rank;
                 } catch (Exception ee) {
                     System.err.println("Client exception: " + ee.toString()); 
